@@ -14,9 +14,10 @@ import spacy
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 
+import plotly.express as px
 
 DC_US_GP = pd.read_csv(
-    r"c:\Users\jason\OneDrive\Bureau\challenge_gameloft\data\reviews_DC_US_GP.csv", sep="\t")
+    r"c:\Users\jason\OneDrive\Bureau\challenge_gameloft\data\reviews_DML_US_GP.csv", sep="\t")
 
 # print(type(D[0, 0]))
 
@@ -42,7 +43,9 @@ print(df2.loc[df2["a"] >= 4, :])
 
 nlp = spacy.load("en_core_web_md")
 test = [doc for doc in nlp.pipe(
-    DC_US_GP["Content"].iloc[:200].astype(str), disable=['parser', 'ner'])]  # liste des 10 premiers commentaires
+    DC_US_GP["Content"].iloc[:5000].astype(str), disable=['parser', 'ner'])]  # liste des 10 premiers commentaires
+
+rate = DC_US_GP["Rating"].iloc[:5000]
 
 
 def list_vectb(phrase):
@@ -82,22 +85,25 @@ kclusterer = KMeansClusterer(
     2, distance=nltk.cluster.util.cosine_distance, repeats=25, avoid_empty_clusters=True)
 clusters = kclusterer.cluster(X, assign_clusters=True)
 print(clusters)
-
-# for index, phrase in enumerate(phrases):
-#     print (str(clusters[index]) + ":" + str(phrase))
+# print(type(clusters))
 
 
 kmeans = cluster.KMeans(n_clusters=2)
 kmeans.fit(X)
 
+px.histogram(x=rate, color=clusters,
+             histnorm="probability density").show()
 
+"""
 model = TSNE(n_components=2, perplexity=6.0, random_state=0)
 np.set_printoptions(suppress=True)
 
 Y = model.fit_transform(np.array(X))
-plt.scatter(Y[:, 0], Y[:, 1], c=clusters, s=200, alpha=.5)
+plt.scatter(Y[:, 0], Y[:, 1], c=clusters, s=50, alpha=.5)
 
 plt.show()
+"""
+
 
 # labels = kmeans.labels_
 # centroids = kmeans.cluster_centers_
